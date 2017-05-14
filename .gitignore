@@ -1,0 +1,16 @@
+.DS_Store
+*.exe
+*.exe.manifest
+*.obj
+*.o
+*.xbe
+*.inl
+*.d
+_*.cpp
+_*.h
+*.pyc
+*.pcap
+log.txt
+*.lib
+*.iso
+bin/*
