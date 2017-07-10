@@ -22,9 +22,9 @@ message Request {
 
 	required Type   type    = 1; //
 	optional string msg     = 2; // DEBUG_PRINT
-	optional int32  address = 3; // FREE, MEM_READ, MEM_WRITE
-	optional int32  size    = 4; // MALLOC, MEM_READ, MEM_WRITE
-	optional int64  value   = 5; // MEM_WRITE
+	optional uint32 address = 3; // FREE, MEM_READ, MEM_WRITE
+	optional uint32 size    = 4; // MALLOC, MEM_READ
+	optional bytes  data    = 5; // MEM_WRITE
 }
 
 message Response {
@@ -37,7 +37,7 @@ message Response {
 	required Type    type    = 1; //
 	optional string  msg     = 2; //
 	optional SysInfo info    = 3; // SYSINFO
-	optional int32   address = 4; // MALLOC
-	optional int32   size    = 5; // 
-	optional int64   value   = 6; // MEM_READ
+	optional uint32  address = 4; // MALLOC
+	optional uint32  size    = 5; //
+	optional bytes   data    = 6; // MEM_READ
 }
