@@ -53,6 +53,7 @@ static int dbgd_mem_write(Dbg__Request *req, Dbg__Response *res);
 static int dbgd_debug_print(Dbg__Request *req, Dbg__Response *res);
 static int dbgd_show_debug_screen(Dbg__Request *req, Dbg__Response *res);
 static int dbgd_show_front_screen(Dbg__Request *req, Dbg__Response *res);
+static int dbgd_call(Dbg__Request *req, Dbg__Response *res);
 
 typedef int (*dbgd_req_handler)(Dbg__Request *req, Dbg__Response *res);
 static dbgd_req_handler handlers[DBG__REQUEST__TYPE__COUNT] = {
@@ -65,6 +66,7 @@ static dbgd_req_handler handlers[DBG__REQUEST__TYPE__COUNT] = {
     &dbgd_debug_print,
     &dbgd_show_debug_screen,
     &dbgd_show_front_screen,
+    &dbgd_call
 };
 
 static void dbgd_serve(struct netconn *conn)
@@ -295,6 +297,64 @@ static int dbgd_show_debug_screen(Dbg__Request *req, Dbg__Response *res)
 static int dbgd_show_front_screen(Dbg__Request *req, Dbg__Response *res)
 {
     pb_show_front_screen();
+
+    return DBG__RESPONSE__TYPE__OK;
+}
+
+static int dbgd_call(Dbg__Request *req, Dbg__Response *res)
+{
+    if (!req->has_address)
+        return DBG__RESPONSE__TYPE__ERROR_INCOMPLETE_REQUEST;
+
+    // These variables will be used as parameters for inline assembly.
+    // We make them static as the stack pointer will be changed.
+    // So we want to address them globally.
+    static uint32_t stack_pointer;
+    static uint32_t stack_backup;
+    static uint32_t address;
+
+    // Allocate a stack for working and space for supplied data
+    size_t stack_size = 0x1000;
+    if (req->has_data) {
+      stack_size += req->data.len;
+    }
+    uint8_t* stack_data = malloc(stack_size);
+
+    // Push optional stack contents, starting at top of stack
+    stack_pointer = (uint32_t)&stack_data[stack_size];
+    if (req->has_data) {
+      stack_pointer -= req->data.len;
+      memcpy((void*)stack_pointer, req->data.data, req->data.len);
+    }
+
+    // Set address to call
+    address = req->address;
+
+    asm("pusha\n"
+        "mov %%esp, %[stack_backup]\n"     // Keep copy of original stack
+        "mov %[stack_pointer], %%esp\n"
+        "call *%[address]\n"               // Call the function
+        "mov %[stack_pointer], %%esp\n"    // push all register values to stack
+        "pusha\n"
+        "mov %[stack_backup], %%esp\n"     // Recover original stack
+        "popa\n"
+
+        : // No outputs
+        : [stack_pointer] "m" (stack_pointer),
+          [stack_backup]  "m" (stack_backup),
+          [address]       "m" (address)
+        : "memory");
+
+    // Get transfer buffer for a set of registers from pusha
+    res->data.len  = 32;
+    res->data.data = get_transfer_buffer(res->data.len);
+    res->has_data = 1;
+
+    // Copy pusha data into return buffer
+    stack_pointer -= res->data.len;
+    memcpy(res->data.data, (void*)stack_pointer, res->data.len);
+
+    free(stack_data);
 
     return DBG__RESPONSE__TYPE__OK;
 }
