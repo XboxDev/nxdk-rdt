@@ -90,6 +90,18 @@ class Xbox(object):
 		req.type = Request.SHOW_FRONT_SCREEN
 		return self._send_simple_request(req)
 
+  def call(self, address, stack, registers=None):
+	  """Call a function with given context"""
+	  req = Request()
+	  req.type = Request.CALL
+	  req.address = address
+	  req.data = stack
+	  #FIXME: req.registers = registers
+	  res = self._send_simple_request(req)
+	  out_registers = {}
+	  out_registers['eax'] = res.address
+	  return out_registers
+
 def read(address, size):
 	i = 0
 	data = bytes()

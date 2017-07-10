@@ -16,13 +16,14 @@ message Request {
 		DEBUG_PRINT       = 6;
 		SHOW_DEBUG_SCREEN = 7;
 		SHOW_FRONT_SCREEN = 8;
+		CALL              = 9;
 
-		COUNT = 9;
+		COUNT = 10;
 	}
 
 	required Type   type    = 1; //
 	optional string msg     = 2; // DEBUG_PRINT
-	optional uint32 address = 3; // FREE, MEM_READ, MEM_WRITE
+	optional uint32 address = 3; // FREE, MEM_READ, MEM_WRITE, CALL
 	optional uint32 size    = 4; // MALLOC, MEM_READ
 	optional bytes  data    = 5; // MEM_WRITE
 }
