@@ -57,17 +57,19 @@ class Xbox(object):
 		req.address = addr
 		return self._send_simple_request(req)
 
-	def mem(self, addr, value=None):
+	def mem(self, addr, size=0, data=None):
 		"""Read/write system memory"""
-		write = value is not None
+		write = data is not None
 		req = Request()
-		req.type    = Request.MEM_WRITE if write else Request.MEM_READ
-		req.address = addr
-		req.size    = 1 # TODO: Support word, dword, qword accesses
 		if write:
-			req.value = value
+			req.type = Request.MEM_WRITE
+			req.data = data
+		else:
+			req.type = Request.MEM_READ
+			req.size = size
+		req.address = addr
 		res = self._send_simple_request(req)
-		return res if write else res.value
+		return res if write else res.data
 
 	def debug_print(self, string):
 		"""Print a debug string to the screen"""
