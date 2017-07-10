@@ -211,21 +211,55 @@ static int dbgd_mem_read(Dbg__Request *req, Dbg__Response *res)
     res->address = req->address;
     res->has_address = 1;
 
-    res->size = 1; /* FIXME: add word, dword, qword support */
-    res->has_size = 1;
+    res->data.len  = req->size;
+    res->data.data = malloc(res->data.len);
+    res->has_data = 1;
 
-    res->value = *((uint8_t*)(req->address));
-    res->has_value = 1;
+    unsigned int i = 0;
+    unsigned int s = req->size;
+
+    while(s >= 4) {
+      *(uint32_t*)&res->data.data[i] = *(volatile uint32_t*)(req->address + i);
+      i += 4;
+      s -= 4;
+    }
+    while(s >= 2) {
+      *(uint16_t*)&res->data.data[i] = *(volatile uint16_t*)(req->address + i);
+      i += 2;
+      s -= 2;
+    }
+    while(s >= 1) {
+      *(uint8_t*)&res->data.data[i] = *(volatile uint8_t*)(req->address + i);
+      i += 1;
+      s -= 1;
+    }
 
     return DBG__RESPONSE__TYPE__OK;
 }
 
 static int dbgd_mem_write(Dbg__Request *req, Dbg__Response *res)
 {
-    if (!req->has_address || !req->has_size || !req->has_value)
+    if (!req->has_address || !req->has_data)
         return DBG__RESPONSE__TYPE__ERROR_INCOMPLETE_REQUEST;
 
-    *((uint8_t*)(req->address)) = (uint8_t)req->value;
+    unsigned int i = 0;
+    unsigned int s = req->data.len;
+
+    while(s >= 4) {
+      *(volatile uint32_t*)(req->address + i) = *(uint32_t*)&req->data.data[i];
+      i += 4;
+      s -= 4;
+    }
+    while(s >= 2) {
+      *(volatile uint16_t*)(req->address + i) = *(uint16_t*)&req->data.data[i];
+      i += 2;
+      s -= 2;
+    }
+    while(s >= 1) {
+      *(volatile uint8_t*)(req->address + i) = *(uint8_t*)&req->data.data[i];
+      i += 1;
+      s -= 1;
+    }
 
     return DBG__RESPONSE__TYPE__OK;
 }
