@@ -2,6 +2,7 @@
 import socket
 from dbg_pb2 import *
 import time
+import struct
 
 class XboxError(Exception):
 	def __init__(self, msg):
@@ -93,6 +94,18 @@ class Xbox(object):
 		req.type = Request.SHOW_FRONT_SCREEN
 		return self._send_simple_request(req)
 
+	def call(self, address, stack=None):
+		"""Call a function with given context"""
+		req = Request()
+		req.type = Request.CALL
+		req.address = address
+		if stack is not None:
+			req.data = stack
+		res = self._send_simple_request(req)
+		eax = struct.unpack_from("<I", res.data, 7*4)[0]
+		return eax
+
+
 def main():
 
 	if (len(sys.argv) != 2):
@@ -115,6 +128,38 @@ def main():
 	print("Allocated memory at 0x%x" % addr)
 	xbox.mem_write(addr, bytes([val]))
 	assert(xbox.mem_read(addr, 1)[0] == val)
+	xbox.free(addr)
+
+	# Inject a function which does `rdtsc; ret`.
+	# RDTSC means "Read Time Stamp Counter". The Time Stamp Counter is a value,
+	# which is incremented every CPU clock cycle.
+	code = bytes([0x0F, 0x31, 0xC3])
+	addr = xbox.malloc(len(code))
+	xbox.mem_write(addr, code)
+
+	# Repeatedly call the injected function until we have a stable timer
+	last_time = None
+	print("Testing call using RDTSC (please wait)")
+	while True:
+
+		# Ask the Xbox for the RDTSC value
+		eax = xbox.call(addr)
+
+		# The timer runs at 733MHz (Xbox CPU Clock speed); Convert to seconds
+		current_time = eax / 733333333.33
+
+		# This is necessary as the timer might wrap around between reads:
+		# First timestamp would appear to be later than the second timestamp.
+		# Also, at startup we only have one measurement, so we can't compare.
+		if last_time is not None and current_time > last_time:
+			break
+
+		# We wait 1 second (this is the time we expect to measure)
+		time.sleep(1.0)
+		last_time = current_time
+
+	# Print the measured time (should be ~1.0 seconds) and free function
+	print("RDTSC measured %.3f seconds" % (current_time - last_time))
 	xbox.free(addr)
 	
 	#xbox.reboot()
