@@ -90,6 +90,47 @@ class Xbox(object):
 		req.type = Request.SHOW_FRONT_SCREEN
 		return self._send_simple_request(req)
 
+def read(address, size):
+	i = 0
+	data = bytes()
+	while True:
+		remaining = size - i
+		if remaining == 0:
+			break
+		c = min(remaining, 100) # lwip will currently choke on more data
+		data += xbox.mem(address + i, size=c)
+		i += c
+	return data
+
+def write(address, data):
+	i = 0
+	while True:
+		remaining = len(data) - i
+		#print(str(i) + " / " + str(len(data)))
+		if remaining == 0:
+			break
+		c = min(remaining, 200) # lwip will currently choke on more data
+		xbox.mem(address + i, data=bytes(data[i:i+c]))
+		i += c
+
+def read_u8(address):
+	data = xbox.mem(address, size=1)
+	return int.from_bytes(data, byteorder='little', signed=False)
+def read_u16(address):
+	data = xbox.mem(address, size=2)
+	return int.from_bytes(data, byteorder='little', signed=False)
+def read_u32(address):
+	data = xbox.mem(address, size=4)
+	return int.from_bytes(data, byteorder='little', signed=False)
+
+def write_u8(address, value):
+	xbox.mem(address, data=value.to_bytes(1, byteorder='little', signed=False))
+def write_u16(address, value):
+	xbox.mem(address, data=value.to_bytes(2, byteorder='little', signed=False))
+def write_u32(address, value):
+	xbox.mem(address, data=value.to_bytes(4, byteorder='little', signed=False))
+
+
 def main():
 	xbox = Xbox()
 	addr = ("127.0.0.1", 8080)

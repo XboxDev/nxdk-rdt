@@ -218,17 +218,17 @@ static int dbgd_mem_read(Dbg__Request *req, Dbg__Response *res)
     unsigned int i = 0;
     unsigned int s = req->size;
 
-    while((s > 0) && (s % 4 == 0)) {
+    while(s >= 4) {
       *(uint32_t*)&res->data.data[i] = *(volatile uint32_t*)(req->address + i);
       i += 4;
       s -= 4;
     }
-    while((s > 0) && (s % 2 == 0)) {
+    while(s >= 2) {
       *(uint16_t*)&res->data.data[i] = *(volatile uint16_t*)(req->address + i);
       i += 2;
       s -= 2;
     }
-    while(s > 0) {
+    while(s >= 1) {
       *(uint8_t*)&res->data.data[i] = *(volatile uint8_t*)(req->address + i);
       i += 1;
       s -= 1;
@@ -245,17 +245,17 @@ static int dbgd_mem_write(Dbg__Request *req, Dbg__Response *res)
     unsigned int i = 0;
     unsigned int s = req->data.len;
 
-    while((s > 0) && (s % 4 == 0)) {
+    while(s >= 4) {
       *(volatile uint32_t*)(req->address + i) = *(uint32_t*)&req->data.data[i];
       i += 4;
       s -= 4;
     }
-    while((s > 0) && (s % 2 == 0)) {
+    while(s >= 2) {
       *(volatile uint16_t*)(req->address + i) = *(uint16_t*)&req->data.data[i];
       i += 2;
       s -= 2;
     }
-    while(s > 0) {
+    while(s >= 1) {
       *(volatile uint8_t*)(req->address + i) = *(uint8_t*)&req->data.data[i];
       i += 1;
       s -= 1;
