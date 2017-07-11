@@ -24,7 +24,7 @@
 #include "net.h"
 #include "dbgd.h"
 
-#define DBGD_PORT 80
+#define DBGD_PORT 9269
 
 #ifndef HTTPD_DEBUG
 #define HTTPD_DEBUG LWIP_DBG_OFF

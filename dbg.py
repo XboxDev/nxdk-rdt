@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import socket
 from dbg_pb2 import *
 import time
@@ -89,13 +90,17 @@ class Xbox(object):
 		return self._send_simple_request(req)
 
 def main():
+
+	if (len(sys.argv) != 2):
+		print("Usage: " + sys.argv[0] + " <server>")
+		sys.exit(1)
+
 	xbox = Xbox()
-	addr = ("127.0.0.1", 8080)
-	# addr = ("10.0.1.14", 80)
+	addr = (sys.argv[1], 9269)
 
 	# Connect to the Xbox, display system info
 	xbox.connect(addr)
-	print xbox.info()
+	print(xbox.info())
 
 	# Print something to the screen
 	xbox.debug_print("Hello!")
@@ -103,7 +108,7 @@ def main():
 	# Allocate, write, read-back, free
 	addr = xbox.malloc(1024)
 	val = 0x5A
-	print "Allocated memory at 0x%x" % addr
+	print("Allocated memory at 0x%x" % addr)
 	xbox.mem(addr, val)
 	assert(xbox.mem(addr) == val)
 	xbox.free(addr)

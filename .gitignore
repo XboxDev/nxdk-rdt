@@ -14,3 +14,8 @@ log.txt
 *.lib
 *.iso
 bin/*
+
+# Generated files
+*.pb-c.c
+*.pb-c.h
+*_pb2.py
