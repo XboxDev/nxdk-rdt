@@ -39,5 +39,4 @@ void main(void)
 
     pb_show_debug_screen();
     pb_kill();
-    HalReturnToFirmware(ReturnFirmwareQuickReboot);
 }
