@@ -58,17 +58,19 @@ class Xbox(object):
 		req.address = addr
 		return self._send_simple_request(req)
 
-	def mem(self, addr, value=None):
+	def mem(self, addr, size=0, data=None):
 		"""Read/write system memory"""
-		write = value is not None
+		write = data is not None
 		req = Request()
-		req.type    = Request.MEM_WRITE if write else Request.MEM_READ
-		req.address = addr
-		req.size    = 1 # TODO: Support word, dword, qword accesses
 		if write:
-			req.value = value
+			req.type = Request.MEM_WRITE
+			req.data = data
+		else:
+			req.type = Request.MEM_READ
+			req.size = size
+		req.address = addr
 		res = self._send_simple_request(req)
-		return res if write else res.value
+		return res if write else res.data
 
 	def debug_print(self, string):
 		"""Print a debug string to the screen"""
@@ -88,6 +90,59 @@ class Xbox(object):
 		req = Request()
 		req.type = Request.SHOW_FRONT_SCREEN
 		return self._send_simple_request(req)
+
+  def call(self, address, stack, registers=None):
+	  """Call a function with given context"""
+	  req = Request()
+	  req.type = Request.CALL
+	  req.address = address
+	  req.data = stack
+	  #FIXME: req.registers = registers
+	  res = self._send_simple_request(req)
+	  out_registers = {}
+	  out_registers['eax'] = res.address
+	  return out_registers
+
+def read(address, size):
+	i = 0
+	data = bytes()
+	while True:
+		remaining = size - i
+		if remaining == 0:
+			break
+		c = min(remaining, 100) # lwip will currently choke on more data
+		data += xbox.mem(address + i, size=c)
+		i += c
+	return data
+
+def write(address, data):
+	i = 0
+	while True:
+		remaining = len(data) - i
+		#print(str(i) + " / " + str(len(data)))
+		if remaining == 0:
+			break
+		c = min(remaining, 200) # lwip will currently choke on more data
+		xbox.mem(address + i, data=bytes(data[i:i+c]))
+		i += c
+
+def read_u8(address):
+	data = xbox.mem(address, size=1)
+	return int.from_bytes(data, byteorder='little', signed=False)
+def read_u16(address):
+	data = xbox.mem(address, size=2)
+	return int.from_bytes(data, byteorder='little', signed=False)
+def read_u32(address):
+	data = xbox.mem(address, size=4)
+	return int.from_bytes(data, byteorder='little', signed=False)
+
+def write_u8(address, value):
+	xbox.mem(address, data=value.to_bytes(1, byteorder='little', signed=False))
+def write_u16(address, value):
+	xbox.mem(address, data=value.to_bytes(2, byteorder='little', signed=False))
+def write_u32(address, value):
+	xbox.mem(address, data=value.to_bytes(4, byteorder='little', signed=False))
+
 
 def main():
 
