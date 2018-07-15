@@ -30,6 +30,20 @@
 #define HTTPD_DEBUG LWIP_DBG_OFF
 #endif
 
+static void* get_transfer_buffer(uint32_t size) {
+    static uint32_t buffer_size = 0;
+    static void* buffer = NULL;
+
+    if (size > buffer_size) {
+        if (buffer != NULL) {
+            free(buffer);
+        }
+        buffer = malloc(size);
+        buffer_size = size;
+    }
+    return buffer;
+}
+
 static int dbgd_sysinfo(Dbg__Request *req, Dbg__Response *res);
 static int dbgd_reboot(Dbg__Request *req, Dbg__Response *res);
 static int dbgd_malloc(Dbg__Request *req, Dbg__Response *res);
@@ -212,7 +226,7 @@ static int dbgd_mem_read(Dbg__Request *req, Dbg__Response *res)
     res->has_address = 1;
 
     res->data.len  = req->size;
-    res->data.data = malloc(res->data.len);
+    res->data.data = get_transfer_buffer(res->data.len);
     res->has_data = 1;
 
     unsigned int i = 0;
