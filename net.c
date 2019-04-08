@@ -17,7 +17,6 @@
 #include <stdlib.h>
 #include <xboxkrnl/xboxkrnl.h>
 #include <xboxrt/debug.h>
-#include <xboxrt/string.h>
 
 #include "net.h"
 
