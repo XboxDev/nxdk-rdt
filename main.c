@@ -16,6 +16,8 @@
 /* Main program function */
 void main(void)
 {
+    XVideoSetMode(640, 480, 32, REFRESH_DEFAULT);
+
     gfx_init();
     pb_print("NXDK Development Dash\n");
 
