@@ -8,7 +8,7 @@
 #include <string.h>
 #include <strings.h>
 #include <xboxkrnl/xboxkrnl.h>
-#include <xboxrt/debug.h>
+#include <hal/debug.h>
 
 static float m_viewport[4][4];
 

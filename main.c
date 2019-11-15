@@ -7,7 +7,7 @@
 #include <string.h>
 #include <strings.h>
 #include <xboxkrnl/xboxkrnl.h>
-#include <xboxrt/debug.h>
+#include <hal/debug.h>
 
 #include "net.h"
 #include "gfx.h"

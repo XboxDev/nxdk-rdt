@@ -17,7 +17,7 @@
 #include <protobuf-c/protobuf-c.h>
 #include <stdlib.h>
 #include <xboxkrnl/xboxkrnl.h>
-#include <xboxrt/debug.h>
+#include <hal/debug.h>
 
 #include "dbg.pb-c.h"
 #include "net.h"
