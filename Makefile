@@ -26,4 +26,4 @@ clean: clean_local
 	protoc --python_out=$(CURDIR)/ $(notdir $<)
 
 %.pb-c.c %.pb-c.h: %.proto
-	protoc-c --c_out=$(CURDIR)/ $(notdir $<)
+	protoc --c_out=$(CURDIR)/ $(notdir $<)
