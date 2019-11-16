@@ -12,7 +12,7 @@ SRCS += $(CURDIR)/dbg.pb-c.c # Might not exist when the wildcard above runs
 CFLAGS += -I$(CURDIR)
 CFLAGS += -I$(CURDIR)/lib
 
-all_local: all dbg_pb2.py
+all_local: dbg_pb2.py dbg.pb-c.c all
 
 include $(NXDK_DIR)/Makefile
 
