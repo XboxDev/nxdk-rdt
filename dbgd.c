@@ -10,7 +10,6 @@
 #include <lwip/opt.h>
 #include <lwip/sys.h>
 #include <lwip/tcpip.h>
-#include <lwip/timers.h>
 #include <netif/etharp.h>
 #include <pbkit/pbkit.h>
 #include <pktdrv.h>
