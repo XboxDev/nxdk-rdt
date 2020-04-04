@@ -42,9 +42,11 @@ Test With XQEMU
 ---------------
 Run with
 
-		-net nic,model=nvnet -net user,hostfwd=tcp::8080-10.0.2.15:80 \
+```
+-net nic,model=nvnet -nic user,hostfwd=tcp::9269-:9269
+```
 
-Then connect to 127.0.0.1:8080.
+Then connect to 127.0.0.1:9269. The dbg.py script can do this using `./dbg.py 127.0.0.1` (port is implied for this tool).
 
 Run on a real Xbox
 ------------------
