@@ -15,6 +15,7 @@ Supported commands:
 * `DEBUG_PRINT` - Print a debug string to the screen
 * `SHOW_DEBUG_SCREEN` - Show the debug screen
 * `SHOW_FRONT_SCREEN` - Switch back to the front screen
+* `CALL` - Call address with given state
 
 To-do list:
 * Code execution
