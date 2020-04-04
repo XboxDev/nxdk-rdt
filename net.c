@@ -10,7 +10,6 @@
 #include <lwip/opt.h>
 #include <lwip/sys.h>
 #include <lwip/tcpip.h>
-#include <lwip/timers.h>
 #include <netif/etharp.h>
 #include <pbkit/pbkit.h>
 #include <protobuf-c/protobuf-c.h>
@@ -80,7 +79,7 @@ int net_init(void)
 
 #if USE_DHCP
     debugPrint("Waiting for DHCP...\n");
-    while (g_pnetif->dhcp->state != DHCP_STATE_BOUND)
+    while (dhcp_supplied_address(g_pnetif) == 0)
         NtYieldExecution();
     debugPrint("DHCP bound!\n");
 #endif
