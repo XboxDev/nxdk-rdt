@@ -1,6 +1,5 @@
-#include <hal/input.h>
 #include <hal/xbox.h>
-#include <hal/xbox.h>
+#include <windows.h>
 #include <lwip/api.h>
 #include <lwip/arch.h>
 #include <lwip/debug.h>
@@ -182,7 +181,7 @@ static int dbgd_sysinfo(Dbg__Request *req, Dbg__Response *res)
     static Dbg__SysInfo xb_info;
 
     dbg__sys_info__init(&xb_info);
-    xb_info.tick_count = XGetTickCount();
+    xb_info.tick_count = GetTickCount();
     res->info = &xb_info;
 
     return DBG__RESPONSE__TYPE__OK;

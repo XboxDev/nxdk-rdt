@@ -1,5 +1,4 @@
 #include "pktdrv.h"
-#include <hal/input.h>
 #include <hal/xbox.h>
 #include <lwip/api.h>
 #include <lwip/arch.h>
