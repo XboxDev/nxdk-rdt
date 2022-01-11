@@ -9,6 +9,7 @@
 #include <strings.h>
 #include <xboxkrnl/xboxkrnl.h>
 #include <hal/debug.h>
+#include <windows.h>
 
 static float m_viewport[4][4];
 
@@ -33,7 +34,7 @@ void gfx_init(void)
 
     if ((status = pb_init())) {
         debugPrint("pb_init Error %d\n", status);
-        XSleep(2000);
+        Sleep(2000);
         XReboot();
         return;
     }

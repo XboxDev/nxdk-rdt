@@ -3,6 +3,7 @@ import socket
 from dbg_pb2 import *
 import time
 import struct
+import sys
 
 class XboxError(Exception):
 	def __init__(self, msg):
